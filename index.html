@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finanzas Personales</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f0f0f;
+  --surface: #1a1a1a;
+  --surface2: #222222;
+  --border: #2a2a2a;
+  --accent: #c9f542;
+  --accent2: #42f5a7;
+  --accent3: #f5a342;
+  --accent4: #f54242;
+  --text: #f0f0f0;
+  --text2: #888;
+  --text3: #555;
+  --radius: 12px;
+  --font-display: 'DM Serif Display', serif;
+  --font-body: 'DM Sans', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; }
+.app { display: flex; min-height: 100vh; }
+.sidebar { width: 240px; min-height: 100vh; background: var(--surface); border-right: 1px solid var(--border); padding: 24px 0; position: fixed; top: 0; left: 0; overflow-y: auto; display: flex; flex-direction: column; z-index: 50; }
+.main { margin-left: 240px; flex: 1; padding: 32px; min-height: 100vh; }
+.sidebar-logo { padding: 0 20px 24px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+.sidebar-logo h1 { font-family: var(--font-display); font-size: 20px; color: var(--accent); line-height: 1.2; }
+.sidebar-logo p { font-size: 11px; color: var(--text3); margin-top: 4px; letter-spacing: 0.05em; text-transform: uppercase; }
+.nav-section { padding: 8px 12px 4px; font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; cursor: pointer; font-size: 14px; color: var(--text2); transition: all 0.15s; border-left: 3px solid transparent; }
+.nav-item:hover { color: var(--text); background: var(--surface2); }
+.nav-item.active { color: var(--accent); border-left-color: var(--accent); background: rgba(201,245,66,0.05); }
+.nav-icon { font-size: 16px; width: 20px; text-align: center; }
+.page-header { margin-bottom: 28px; }
+.page-header h2 { font-family: var(--font-display); font-size: 28px; color: var(--text); }
+.page-header p { color: var(--text2); font-size: 14px; margin-top: 4px; }
+.cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+.card-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+.card-value { font-family: var(--font-display); font-size: 26px; color: var(--text); }
+.card-value.green { color: var(--accent); }
+.card-value.red { color: var(--accent4); }
+.card-value.yellow { color: var(--accent3); }
+.card-sub { font-size: 12px; color: var(--text3); margin-top: 6px; }
+.table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th { padding: 12px 16px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); border-bottom: 1px solid var(--border); white-space: nowrap; }
+td { padding: 13px 16px; font-size: 14px; border-bottom: 1px solid var(--border); color: var(--text2); }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--surface2); }
+.td-main { color: var(--text) !important; font-weight: 500; }
+.badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+.badge-green { background: rgba(201,245,66,0.12); color: var(--accent); }
+.badge-red { background: rgba(245,66,66,0.12); color: var(--accent4); }
+.badge-yellow { background: rgba(245,163,66,0.12); color: var(--accent3); }
+.badge-blue { background: rgba(66,245,167,0.12); color: var(--accent2); }
+.badge-gray { background: rgba(255,255,255,0.06); color: var(--text2); }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; border-radius: 8px; font-size: 13px; font-family: var(--font-body); font-weight: 500; cursor: pointer; border: none; transition: all 0.15s; }
+.btn-primary { background: var(--accent); color: #0f0f0f; }
+.btn-primary:hover { background: #d4f55a; }
+.btn-ghost { background: transparent; color: var(--text2); border: 1px solid var(--border); }
+.btn-ghost:hover { background: var(--surface2); color: var(--text); }
+.btn-danger { background: rgba(245,66,66,0.1); color: var(--accent4); border: 1px solid rgba(245,66,66,0.2); }
+.btn-danger:hover { background: rgba(245,66,66,0.2); }
+.btn-sm { padding: 5px 12px; font-size: 12px; }
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(4px); }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 28px; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; }
+.modal h3 { font-family: var(--font-display); font-size: 22px; margin-bottom: 20px; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group.span2 { grid-column: span 2; }
+label { font-size: 12px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; }
+input, select, textarea { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 14px; color: var(--text); font-family: var(--font-body); outline: none; transition: border 0.15s; width: 100%; }
+input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+select option { background: var(--surface); }
+textarea { resize: vertical; min-height: 80px; }
+.filters { display: flex; gap: 10px; flex-wrap: wrap; }
+.filter-select { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 13px; color: var(--text2); font-family: var(--font-body); outline: none; cursor: pointer; }
+.progress-wrap { background: var(--border); border-radius: 4px; height: 6px; overflow: hidden; }
+.progress-bar { height: 100%; border-radius: 4px; background: var(--accent); transition: width 0.3s; }
+.payments-list { display: flex; flex-direction: column; gap: 8px; }
+.payment-item { display: flex; align-items: center; justify-content: space-between; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; }
+.payment-left { display: flex; align-items: center; gap: 12px; }
+.payment-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.payment-name { font-size: 14px; font-weight: 500; }
+.payment-date { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.payment-amount { font-family: var(--font-display); font-size: 16px; }
+.tabs { display: flex; gap: 4px; margin-bottom: 20px; background: var(--surface); border-radius: 10px; padding: 4px; width: fit-content; }
+.tab { padding: 8px 16px; border-radius: 7px; font-size: 13px; cursor: pointer; color: var(--text2); transition: all 0.15s; }
+.tab.active { background: var(--accent); color: #0f0f0f; font-weight: 600; }
+.empty { text-align: center; padding: 48px 20px; color: var(--text3); }
+.empty-icon { font-size: 36px; margin-bottom: 12px; }
+.actions-col { display: flex; gap: 6px; }
+.alert { padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; }
+.alert.show { display: block; }
+.alert-success { background: rgba(201,245,66,0.1); border: 1px solid rgba(201,245,66,0.2); color: var(--accent); }
+.alert-error { background: rgba(245,66,66,0.1); border: 1px solid rgba(245,66,66,0.2); color: var(--accent4); }
+.loading { text-align: center; padding: 40px; color: var(--text3); font-size: 14px; }
+.row-actions { display: flex; gap: 6px; }
+.flex-between { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <h1>Finanzas<br>Personales</h1>
+    <p>Panel de control</p>
+  </div>
+  <div class="nav-section">General</div>
+  <div class="nav-item active" onclick="showSection('dashboard',this)"><span class="nav-icon">🏠</span><span>Dashboard</span></div>
+  <div class="nav-section">Economía</div>
+  <div class="nav-item" onclick="showSection('ingresos',this)"><span class="nav-icon">💰</span><span>Ingresos y Gastos</span></div>
+  <div class="nav-item" onclick="showSection('suscripciones',this)"><span class="nav-icon">🔄</span><span>Suscripciones</span></div>
+  <div class="nav-item" onclick="showSection('prestamos',this)"><span class="nav-icon">🏦</span><span>Préstamos</span></div>
+  <div class="nav-item" onclick="showSection('ahorro',this)"><span class="nav-icon">🎯</span><span>Objetivos de Ahorro</span></div>
+  <div class="nav-section">Hogar</div>
+  <div class="nav-item" onclick="showSection('seguros',this)"><span class="nav-icon">🛡️</span><span>Seguros</span></div>
+  <div class="nav-item" onclick="showSection('suministros',this)"><span class="nav-icon">⚡</span><span>Suministros</span></div>
+  <div class="nav-item" onclick="showSection('telecom',this)"><span class="nav-icon">📱</span><span>Telecom / Móvil</span></div>
+  <div class="nav-section">Inversiones</div>
+  <div class="nav-item" onclick="showSection('portfolio',this)"><span class="nav-icon">📈</span><span>Portfolio</span></div>
+</nav>
+
+<main class="main">
+<div id="alert" class="alert"></div>
+
+<!-- DASHBOARD -->
+<section id="sec-dashboard">
+  <div class="page-header">
+    <h2>Dashboard</h2>
+    <p id="dash-date"></p>
+  </div>
+  <div style="margin-bottom:12px;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em">Resumen del mes actual</div>
+  <div class="cards-grid">
+    <div class="card"><div class="card-label">Ingresos mes</div><div class="card-value green" id="dash-ingresos">—</div><div class="card-sub">Este mes</div></div>
+    <div class="card"><div class="card-label">Gastos mes</div><div class="card-value red" id="dash-gastos">—</div><div class="card-sub">Este mes</div></div>
+    <div class="card"><div class="card-label">Balance mes</div><div class="card-value" id="dash-balance">—</div><div class="card-sub">Ingresos − Gastos</div></div>
+    <div class="card"><div class="card-label">Gastos fijos</div><div class="card-value yellow" id="dash-fijos">—</div><div class="card-sub">Suscripciones + préstamos</div></div>
+  </div>
+  <div class="cards-grid">
+    <div class="card"><div class="card-label">Portfolio valor</div><div class="card-value" id="dash-portfolio">—</div><div class="card-sub">Valor actual</div></div>
+    <div class="card"><div class="card-label">Rentabilidad</div><div class="card-value" id="dash-rent">—</div><div class="card-sub">Vs precio medio</div></div>
+    <div class="card"><div class="card-label">Seguros activos</div><div class="card-value" id="dash-seguros">—</div><div class="card-sub">Pólizas</div></div>
+    <div class="card"><div class="card-label">Suscripciones/mes</div><div class="card-value yellow" id="dash-subs">—</div><div class="card-sub">Coste mensual total</div></div>
+  </div>
+  <div style="margin-bottom:12px;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em">Próximos pagos (30 días)</div>
+  <div class="payments-list" id="dash-pagos"><div class="loading">Cargando...</div></div>
+</section>
+
+<!-- INGRESOS/GASTOS -->
+<section id="sec-ingresos" style="display:none">
+  <div class="page-header"><h2>Ingresos y Gastos</h2><p>Registro de movimientos económicos</p></div>
+  <div class="flex-between">
+    <div class="filters">
+      <select class="filter-select" id="ig-mes" onchange="loadIG()">
+        <option value="">Todos los meses</option>
+        <option value="01">Enero</option><option value="02">Febrero</option><option value="03">Marzo</option>
+        <option value="04">Abril</option><option value="05">Mayo</option><option value="06">Junio</option>
+        <option value="07">Julio</option><option value="08">Agosto</option><option value="09">Septiembre</option>
+        <option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
+      </select>
+      <select class="filter-select" id="ig-anio" onchange="loadIG()"><option value="">Todos los años</option></select>
+      <select class="filter-select" id="ig-tipo" onchange="loadIG()">
+        <option value="">Ingreso + Gasto</option>
+        <option value="ingreso">Solo Ingresos</option>
+        <option value="gasto">Solo Gastos</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" onclick="openModal('modal-ig')">+ Añadir</button>
+  </div>
+  <div class="cards-grid" style="margin-bottom:20px">
+    <div class="card"><div class="card-label">Ingresos</div><div class="card-value green" id="ig-total-ing">0,00 €</div></div>
+    <div class="card"><div class="card-label">Gastos</div><div class="card-value red" id="ig-total-gas">0,00 €</div></div>
+    <div class="card"><div class="card-label">Balance</div><div class="card-value" id="ig-bal">0,00 €</div></div>
+  </div>
+  <div class="table-wrap">
+    <table><thead><tr><th>Fecha</th><th>Tipo</th><th>Categoría</th><th>Descripción</th><th>Importe</th><th>Acciones</th></tr></thead>
+    <tbody id="ig-tbody"><tr><td colspan="6"><div class="loading">Cargando...</div></td></tr></tbody></table>
+  </div>
+</section>
+
+<!-- SEGUROS -->
+<section id="sec-seguros" style="display:none">
+  <div class="page-header"><h2>Seguros</h2><p>Gestión de pólizas</p></div>
+  <div class="flex-between"><div></div><button class="btn btn-primary" onclick="openModal('modal-seguro')">+ Añadir Seguro</button></div>
+  <div class="table-wrap">
+    <table><thead><tr><th>Nombre</th><th>Compañía</th><th>Cobertura</th><th>Prima anual</th><th>Prima mensual</th><th>Renovación</th><th>Acciones</th></tr></thead>
+    <tbody id="seg-tbody"><tr><td colspan="7"><div class="loading">Cargando...</div></td></tr></tbody></table>
+  </div>
+</section>
+
+<!-- SUMINISTROS -->
+<section id="sec-suministros" style="display:none">
+  <div class="page-header"><h2>Suministros</h2><p>Luz, agua, gas, internet</p></div>
+  <div class="flex-between">
+    <div class="tabs">
+      <div class="tab active" onclick="setSumFiltro('',this)">Todos</div>
+      <div class="tab" onclick="setSumFiltro('luz',this)">⚡ Luz</div>
+      <div class="tab" onclick="setSumFiltro('agua',this)">💧 Agua</div>
+      <div class="tab" onclick="setSumFiltro('gas',this)">🔥 Gas</div>
+      <div class="tab" onclick="setSumFiltro('internet',this)">🌐 Internet</div>
+    </div>
+    <button class="btn btn-primary" onclick="openModal('modal-suministro')">+ Añadir</button>
+  </div>
+  <div class="table-wrap">
+    <table><thead><tr><th>Tipo</th><th>Compañía</th><th>Importe</th><th>Fecha factura</th><th>Vencimiento</th><th>Notas</th><th>Acciones</th></tr></thead>
+    <tbody id="sum-tbody"><tr><td colspan="7"><div class="loading">Cargando...</div></td></tr></tbody></table>
+  </div>
+</section>
+
+<!-- TELECOM -->
+<section id="sec-telecom" style="display:none">
+  <div class="page-header"><h2>Telecom / Móvil</h2><p>Contratos de telecomunicaciones</p></div>
+  <div class="flex-between"><div></div><button class="btn btn-primary" onclick="openModal('modal-telecom')">+ Añadir</button></div>
+  <div class="table-wrap">
+    <table><thead><tr><th>Operador</th><th>Tarifa</th><th>Coste/mes</th><th>Renovación</th><th>Notas</th><th>Acciones</th></tr></thead>
+    <tbody id="tel-tbody"><tr><td colspan="6"><div class="loading">Cargando...</div></td></tr></tbody></table>
+  </div>
+</section>
+
+<!-- SUSCRIPCIONES -->
+<section id="sec-suscripciones" style="display:none">
+  <div class="page-header"><h2>Suscripciones</h2><p>Pagos recurrentes</p></div>
+  <div class="flex-between">
+    <div class="card" style="padding:14px 20px"><div class="card-label">Total mensual</div><div class="card-value yellow" id="sub-total">0,00 €</div></div>
+    <button class="btn btn-primary" onclick="openModal('modal-sub')">+ Añadir</button>
+  </div>
+  <div class="table-wrap">
+    <table><thead><tr><th>Servicio</th><th>Coste</th><th>Frecuencia</th><th>Próximo cobro</th><th>Estado</th><th>Notas</th><th>Acciones</th></tr></thead>
+    <tbody id="sub-tbody"><tr><td colspan="7"><div class="loading">Cargando...</div></td></tr></tbody></table>
+  </div>
+</section>
+
+<!-- PRÉSTAMOS -->
+<section id="sec-prestamos" style="display:none">
+  <div class="page-header"><h2>Préstamos y Deudas</h2><p>Control de financiación</p></div>
+  <div class="flex-between"><div id="pre-cards" style="display:flex;gap:16px;flex-wrap:wrap"></div><button class="btn btn-primary" onclick="openModal('modal-pre')">+ Añadir</button></div>
+  <div class="table-wrap" style="margin-top:20px">
+    <table><thead><tr><th>Nombre</th><th>Capital inicial</th><th>Pendiente</th><th>Cuota/mes</th><th>Interés</th><th>Fin</th><th>Progreso</th><th>Acciones</th></tr></thead>
+    <tbody id="pre-tbody"><tr><td colspan="8"><div class="loading">Cargando...</div></td></tr></tbody></table>
+  </div>
+</section>
+
+<!-- AHORRO -->
+<section id="sec-ahorro" style="display:none">
+  <div class="page-header"><h2>Objetivos de Ahorro</h2><p>Metas financieras personales</p></div>
+  <div class="flex-between"><div></div><button class="btn btn-primary" onclick="openModal('modal-aho')">+ Añadir Objetivo</button></div>
+  <div class="cards-grid" id="aho-grid"></div>
+</section>
+
+<!-- PORTFOLIO -->
+<section id="sec-portfolio" style="display:none">
+  <div class="page-header"><h2>Portfolio de Inversiones</h2><p>Seguimiento de activos</p></div>
+  <div class="cards-grid">
+    <div class="card"><div class="card-label">Valor actual</div><div class="card-value green" id="port-val">—</div></div>
+    <div class="card"><div class="card-label">Coste total</div><div class="card-value" id="port-cos">—</div></div>
+    <div class="card"><div class="card-label">Ganancia/Pérdida</div><div class="card-value" id="port-gan">—</div></div>
+    <div class="card"><div class="card-label">Rentabilidad</div><div class="card-value" id="port-ren">—</div></div>
+  </div>
+  <div class="flex-between"><div></div><button class="btn btn-primary" onclick="openModal('modal-port')">+ Añadir Activo</button></div>
+  <div class="table-wrap">
+    <table><thead><tr><th>Ticker</th><th>Nombre</th><th>Tipo</th><th>Participaciones</th><th>P.Medio</th><th>P.Actual</th><th>Valor</th><th>+/− €</th><th>+/− %</th><th>Acciones</th></tr></thead>
+    <tbody id="port-tbody"><tr><td colspan="10"><div class="loading">Cargando...</div></td></tr></tbody></table>
+  </div>
+</section>
+</main>
+</div>
+
+<!-- MODAL INGRESO/GASTO -->
+<div class="modal-overlay" id="modal-ig">
+  <div class="modal">
+    <h3 id="modal-ig-t">Añadir movimiento</h3>
+    <div class="form-grid">
+      <div class="form-group"><label>Tipo</label><select id="f-ig-tipo"><option value="ingreso">Ingreso</option><option value="gasto">Gasto</option></select></div>
+      <div class="form-group"><label>Fecha</label><input type="date" id="f-ig-fecha"></div>
+      <div class="form-group"><label>Categoría</label>
+        <select id="f-ig-cat">
+          <option>Salario</option><option>Negocio</option><option>Inversiones</option>
+          <option>Alimentación</option><option>Transporte</option><option>Ocio</option>
+          <option>Salud</option><option>Educación</option><option>Hogar</option>
+          <option>Ropa</option><option>Restaurantes</option><option>Otros</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Importe (€)</label><input type="number" id="f-ig-imp" placeholder="0.00" step="0.01" min="0"></div>
+      <div class="form-group span2"><label>Descripción</label><input type="text" id="f-ig-des" placeholder="Descripción del movimiento"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-ig')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveIG()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SEGURO -->
+<div class="modal-overlay" id="modal-seguro">
+  <div class="modal">
+    <h3 id="modal-seg-t">Añadir Seguro</h3>
+    <div class="form-grid">
+      <div class="form-group"><label>Nombre</label><input type="text" id="f-seg-nom" placeholder="Seguro del coche"></div>
+      <div class="form-group"><label>Compañía</label><input type="text" id="f-seg-com" placeholder="Mapfre, AXA..."></div>
+      <div class="form-group"><label>Prima anual (€)</label><input type="number" id="f-seg-pa" step="0.01" placeholder="0.00"></div>
+      <div class="form-group"><label>Prima mensual (€)</label><input type="number" id="f-seg-pm" step="0.01" placeholder="0.00"></div>
+      <div class="form-group"><label>Fecha renovación</label><input type="date" id="f-seg-ren"></div>
+      <div class="form-group"><label>Cobertura</label><input type="text" id="f-seg-cob" placeholder="Todo riesgo..."></div>
+      <div class="form-group span2"><label>Notas</label><textarea id="f-seg-not" placeholder="Notas..."></textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-seguro')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveSeguro()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SUMINISTRO -->
+<div class="modal-overlay" id="modal-suministro">
+  <div class="modal">
+    <h3 id="modal-sum-t">Añadir Suministro</h3>
+    <div class="form-grid">
+      <div class="form-group"><label>Tipo</label><select id="f-sum-tip"><option value="luz">⚡ Luz</option><option value="agua">💧 Agua</option><option value="gas">🔥 Gas</option><option value="internet">🌐 Internet</option><option value="otro">Otro</option></select></div>
+      <div class="form-group"><label>Compañía</label><input type="text" id="f-sum-com" placeholder="Endesa, Iberdrola..."></div>
+      <div class="form-group"><label>Importe (€)</label><input type="number" id="f-sum-imp" step="0.01" placeholder="0.00"></div>
+      <div class="form-group"><label>Fecha factura</label><input type="date" id="f-sum-fec"></div>
+      <div class="form-group"><label>Fecha vencimiento</label><input type="date" id="f-sum-ven"></div>
+      <div class="form-group span2"><label>Notas</label><textarea id="f-sum-not" placeholder="Notas..."></textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-suministro')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveSuministro()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL TELECOM -->
+<div class="modal-overlay" id="modal-telecom">
+  <div class="modal">
+    <h3 id="modal-tel-t">Añadir Telecom</h3>
+    <div class="form-grid">
+      <div class="form-group"><label>Operador</label><input type="text" id="f-tel-op" placeholder="Movistar, Vodafone..."></div>
+      <div class="form-group"><label>Tarifa</label><input type="text" id="f-tel-tar" placeholder="Fibra 600 + móvil"></div>
+      <div class="form-group"><label>Coste mensual (€)</label><input type="number" id="f-tel-cos" step="0.01" placeholder="0.00"></div>
+      <div class="form-group"><label>Fecha renovación</label><input type="date" id="f-tel-ren"></div>
+      <div class="form-group span2"><label>Notas</label><textarea id="f-tel-not" placeholder="Notas..."></textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-telecom')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveTelecom()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SUSCRIPCION -->
+<div class="modal-overlay" id="modal-sub">
+  <div class="modal">
+    <h3 id="modal-sub-t">Añadir Suscripción</h3>
+    <div class="form-grid">
+      <div class="form-group"><label>Servicio</label><input type="text" id="f-sub-nom" placeholder="Netflix, Spotify..."></div>
+      <div class="form-group"><label>Coste (€)</label><input type="number" id="f-sub-cos" step="0.01" placeholder="0.00"></div>
+      <div class="form-group"><label>Frecuencia</label><select id="f-sub-fre"><option value="mensual">Mensual</option><option value="anual">Anual</option><option value="trimestral">Trimestral</option></select></div>
+      <div class="form-group"><label>Próximo cobro</label><input type="date" id="f-sub-fec"></div>
+      <div class="form-group"><label>Estado</label><select id="f-sub-act"><option value="true">Activa</option><option value="false">Inactiva</option></select></div>
+      <div class="form-group span2"><label>Notas</label><textarea id="f-sub-not" placeholder="Notas..."></textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-sub')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveSub()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PRESTAMO -->
+<div class="modal-overlay" id="modal-pre">
+  <div class="modal">
+    <h3 id="modal-pre-t">Añadir Préstamo</h3>
+    <div class="form-grid">
+      <div class="form-group span2"><label>Nombre</label><input type="text" id="f-pre-nom" placeholder="Hipoteca, coche..."></div>
+      <div class="form-group"><label>Capital inicial (€)</label><input type="number" id="f-pre-ci" step="0.01" placeholder="0.00"></div>
+      <div class="form-group"><label>Capital pendiente (€)</label><input type="number" id="f-pre-cp" step="0.01" placeholder="0.00"></div>
+      <div class="form-group"><label>Cuota mensual (€)</label><input type="number" id="f-pre-cuo" step="0.01" placeholder="0.00"></div>
+      <div class="form-group"><label>Tipo interés (%)</label><input type="number" id="f-pre-int" step="0.01" placeholder="0.00"></div>
+      <div class="form-group"><label>Fecha inicio</label><input type="date" id="f-pre-ini"></div>
+      <div class="form-group"><label>Fecha fin</label><input type="date" id="f-pre-fin"></div>
+      <div class="form-group span2"><label>Notas</label><textarea id="f-pre-not" placeholder="Notas..."></textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-pre')">Cancelar</button>
+      <button class="btn btn-primary" onclick="savePre()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL AHORRO -->
+<div class="modal-overlay" id="modal-aho">
+  <div class="modal">
+    <h3 id="modal-aho-t">Añadir Objetivo de Ahorro</h3>
+    <div class="form-grid">
+      <div class="form-group span2"><label>Nombre</label><input type="text" id="f-aho-nom" placeholder="Vacaciones, coche nuevo..."></div>
+      <div class="form-group"><label>Meta (€)</label><input type="number" id="f-aho-met" step="0.01" placeholder="0.00"></div>
+      <div class="form-group"><label>Ahorrado hasta ahora (€)</label><input type="number" id="f-aho-act" step="0.01" placeholder="0.00"></div>
+      <div class="form-group"><label>Fecha objetivo</label><input type="date" id="f-aho-fec"></div>
+      <div class="form-group span2"><label>Notas</label><textarea id="f-aho-not" placeholder="Notas..."></textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-aho')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveAho()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PORTFOLIO -->
+<div class="modal-overlay" id="modal-port">
+  <div class="modal">
+    <h3 id="modal-port-t">Añadir Activo</h3>
+    <div class="form-grid">
+      <div class="form-group"><label>Ticker</label><input type="text" id="f-port-tic" placeholder="AAPL, AMUNDI..."></div>
+      <div class="form-group"><label>Nombre</label><input type="text" id="f-port-nom" placeholder="Apple Inc."></div>
+      <div class="form-group"><label>Tipo</label><select id="f-port-tip"><option>ETF</option><option>Acción</option><option>Fondo</option><option>Crypto</option><option>Otro</option></select></div>
+      <div class="form-group"><label>Participaciones</label><input type="number" id="f-port-par" step="0.0001" placeholder="0.0000"></div>
+      <div class="form-group"><label>Precio medio (€)</label><input type="number" id="f-port-pm" step="0.0001" placeholder="0.0000"></div>
+      <div class="form-group"><label>Precio actual (€)</label><input type="number" id="f-port-pa" step="0.0001" placeholder="0.0000"></div>
+      <div class="form-group span2"><label>Notas</label><textarea id="f-port-not" placeholder="Notas..."></textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-port')">Cancelar</button>
+      <button class="btn btn-primary" onclick="savePort()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SB = 'https://rjpjqrsyzkeghofziejy.supabase.co';
+const SK = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqcGpxcnN5emtlZ2hvZnppZWp5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NTI1MjYsImV4cCI6MjA5NDQyODUyNn0.httUrRI99cAO1YpiZzfcFcIAj5y41QB817b9pdfjbI4';
+const H = { 'Content-Type':'application/json', 'apikey':SK, 'Authorization':'Bearer '+SK, 'Prefer':'return=representation' };
+
+let editId = null;
+let sumFiltro = '';
+
+// FORMAT
+function fmt(n) { return Number(n||0).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'; }
+function fmtN(n,d=2) { return Number(n||0).toLocaleString('es-ES',{minimumFractionDigits:d,maximumFractionDigits:d}); }
+function fmtD(d) { if(!d) return '—'; const [y,m,dd]=d.split('-'); return `${dd}/${m}/${y}`; }
+function today() { return new Date().toISOString().split('T')[0]; }
+function daysTo(d) { if(!d) return null; return Math.ceil((new Date(d)-new Date())/86400000); }
+
+// ALERT
+function alert2(msg, type='success') {
+  const el=document.getElementById('alert');
+  el.textContent=msg; el.className=`alert show alert-${type}`;
+  setTimeout(()=>el.className='alert',3000);
+}
+
+// API
+async function dbGet(table, qs='') {
+  const r=await fetch(`${SB}/rest/v1/${table}?${qs}&order=created_at.desc`,{headers:H});
+  if(!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+async function dbPost(table, data) {
+  const r=await fetch(`${SB}/rest/v1/${table}`,{method:'POST',headers:H,body:JSON.stringify(data)});
+  if(!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+async function dbPatch(table, id, data) {
+  const r=await fetch(`${SB}/rest/v1/${table}?id=eq.${id}`,{method:'PATCH',headers:H,body:JSON.stringify(data)});
+  if(!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+async function dbDel(table, id) {
+  const r=await fetch(`${SB}/rest/v1/${table}?id=eq.${id}`,{method:'DELETE',headers:H});
+  if(!r.ok) throw new Error(await r.text());
+}
+
+// NAV
+function showSection(name, el) {
+  document.querySelectorAll('.main > section').forEach(s=>s.style.display='none');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('sec-'+name).style.display='block';
+  el.classList.add('active');
+  ({dashboard:loadDash,ingresos:loadIG,seguros:loadSeg,suministros:loadSum,telecom:loadTel,suscripciones:loadSub,prestamos:loadPre,ahorro:loadAho,portfolio:loadPort})[name]?.();
+}
+
+// MODALS
+function openModal(id, data=null) {
+  editId = data?.id || null;
+  document.getElementById(id).classList.add('open');
+  if(!data) {
+    document.querySelectorAll(`#${id} input`).forEach(el=>{if(el.type==='date')el.value=today();else el.value='';});
+    document.querySelectorAll(`#${id} select`).forEach(el=>el.selectedIndex=0);
+    document.querySelectorAll(`#${id} textarea`).forEach(el=>el.value='');
+  } else fillForm(id,data);
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); editId=null; }
+
+const FIELD_MAP = {
+  'modal-ig':[['f-ig-tipo','tipo'],['f-ig-fecha','fecha'],['f-ig-cat','categoria'],['f-ig-imp','importe'],['f-ig-des','descripcion']],
+  'modal-seguro':[['f-seg-nom','nombre'],['f-seg-com','compania'],['f-seg-pa','prima_anual'],['f-seg-pm','prima_mensual'],['f-seg-ren','fecha_renovacion'],['f-seg-cob','cobertura'],['f-seg-not','notas']],
+  'modal-suministro':[['f-sum-tip','tipo'],['f-sum-com','compania'],['f-sum-imp','importe'],['f-sum-fec','fecha_factura'],['f-sum-ven','fecha_vencimiento'],['f-sum-not','notas']],
+  'modal-telecom':[['f-tel-op','operador'],['f-tel-tar','tarifa'],['f-tel-cos','coste_mensual'],['f-tel-ren','fecha_renovacion'],['f-tel-not','notas']],
+  'modal-sub':[['f-sub-nom','nombre'],['f-sub-cos','coste'],['f-sub-fre','frecuencia'],['f-sub-fec','fecha_cobro'],['f-sub-act','activa'],['f-sub-not','notas']],
+  'modal-pre':[['f-pre-nom','nombre'],['f-pre-ci','capital_inicial'],['f-pre-cp','capital_pendiente'],['f-pre-cuo','cuota_mensual'],['f-pre-int','tipo_interes'],['f-pre-ini','fecha_inicio'],['f-pre-fin','fecha_fin'],['f-pre-not','notas']],
+  'modal-aho':[['f-aho-nom','nombre'],['f-aho-met','importe_meta'],['f-aho-act','importe_actual'],['f-aho-fec','fecha_objetivo'],['f-aho-not','notas']],
+  'modal-port':[['f-port-tic','ticker'],['f-port-nom','nombre'],['f-port-tip','tipo'],['f-port-par','participaciones'],['f-port-pm','precio_medio'],['f-port-pa','precio_actual'],['f-port-not','notas']]
+};
+
+function fillForm(modalId, d) {
+  (FIELD_MAP[modalId]||[]).forEach(([elId,key])=>{
+    const el=document.getElementById(elId);
+    if(el && d[key]!=null) el.value=d[key];
+  });
+}
+
+async function saveItem(table, data, modalId, reloadFn) {
+  try {
+    if(editId) await dbPatch(table,editId,data);
+    else await dbPost(table,data);
+    alert2(editId?'Actualizado ✓':'Añadido ✓');
+    closeModal(modalId); reloadFn();
+  } catch(e) { alert2('Error: '+e.message,'error'); }
+}
+
+async function del(table, id, reload) {
+  if(!confirm('¿Eliminar este registro?')) return;
+  try { await dbDel(table,id); alert2('Eliminado ✓'); reload(); }
+  catch(e) { alert2('Error al eliminar','error'); }
+}
+
+// EMPTY
+function empty(icon, msg) { return `<div class="empty"><div class="empty-icon">${icon}</div><p>${msg}</p></div>`; }
+
+// ===== DASHBOARD =====
+async function loadDash() {
+  const now=new Date();
+  document.getElementById('dash-date').textContent=now.toLocaleDateString('es-ES',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const m=String(now.getMonth()+1).padStart(2,'0'), y=now.getFullYear();
+  try {
+    const [ig,subs,pres,port,segs,sums,tels] = await Promise.all([
+      dbGet('ingresos_gastos',`fecha=gte.${y}-${m}-01&fecha=lte.${y}-${m}-31`),
+      dbGet('suscripciones','activa=eq.true'),
+      dbGet('prestamos',''),
+      dbGet('portfolio',''),
+      dbGet('seguros',''),
+      dbGet('suministros',''),
+      dbGet('telecomunicaciones','')
+    ]);
+    const ingresos=ig.filter(r=>r.tipo==='ingreso').reduce((s,r)=>s+Number(r.importe||0),0);
+    const gastos=ig.filter(r=>r.tipo==='gasto').reduce((s,r)=>s+Number(r.importe||0),0);
+    const bal=ingresos-gastos;
+    const subsM=subs.reduce((s,r)=>{let c=Number(r.coste||0);if(r.frecuencia==='anual')c/=12;if(r.frecuencia==='trimestral')c/=3;return s+c;},0);
+    const presM=pres.reduce((s,r)=>s+Number(r.cuota_mensual||0),0);
+    const portV=port.reduce((s,r)=>s+Number(r.participaciones||0)*Number(r.precio_actual||0),0);
+    const portC=port.reduce((s,r)=>s+Number(r.participaciones||0)*Number(r.precio_medio||0),0);
+    const portR=portC>0?(portV-portC)/portC*100:0;
+    document.getElementById('dash-ingresos').textContent=fmt(ingresos);
+    document.getElementById('dash-gastos').textContent=fmt(gastos);
+    const bEl=document.getElementById('dash-balance');
+    bEl.textContent=fmt(bal); bEl.className='card-value '+(bal>=0?'green':'red');
+    document.getElementById('dash-fijos').textContent=fmt(subsM+presM);
+    document.getElementById('dash-portfolio').textContent=fmt(portV);
+    const rEl=document.getElementById('dash-rent');
+    rEl.textContent=fmtN(portR)+'%'; rEl.className='card-value '+(portR>=0?'green':'red');
+    document.getElementById('dash-seguros').textContent=segs.length;
+    document.getElementById('dash-subs').textContent=fmt(subsM);
+    // Pagos próximos
+    const pagos=[];
+    subs.forEach(s=>{const d=daysTo(s.fecha_cobro);if(d!=null&&d>=0&&d<=30)pagos.push({n:s.nombre,f:s.fecha_cobro,i:s.coste,ico:'🔄',c:'#f5a342'});});
+    segs.forEach(s=>{const d=daysTo(s.fecha_renovacion);if(d!=null&&d>=0&&d<=30)pagos.push({n:s.nombre,f:s.fecha_renovacion,i:s.prima_mensual,ico:'🛡️',c:'#42f5a7'});});
+    sums.forEach(s=>{const d=daysTo(s.fecha_vencimiento);if(d!=null&&d>=0&&d<=30)pagos.push({n:(s.tipo||'')+' '+(s.compania||''),f:s.fecha_vencimiento,i:s.importe,ico:'⚡',c:'#c9f542'});});
+    tels.forEach(s=>{const d=daysTo(s.fecha_renovacion);if(d!=null&&d>=0&&d<=30)pagos.push({n:s.operador,f:s.fecha_renovacion,i:s.coste_mensual,ico:'📱',c:'#f54242'});});
+    pagos.sort((a,b)=>new Date(a.f)-new Date(b.f));
+    const pEl=document.getElementById('dash-pagos');
+    pEl.innerHTML=pagos.length?pagos.map(p=>`
+      <div class="payment-item">
+        <div class="payment-left">
+          <div class="payment-icon" style="background:${p.c}22;color:${p.c}">${p.ico}</div>
+          <div><div class="payment-name">${p.n}</div><div class="payment-date">${fmtD(p.f)} · en ${daysTo(p.f)} días</div></div>
+        </div>
+        <div class="payment-amount" style="color:${p.c}">${fmt(p.i)}</div>
+      </div>`).join('') : empty('📅','No hay pagos en los próximos 30 días');
+  } catch(e) { console.error(e); }
+}
+
+// ===== INGRESOS/GASTOS =====
+async function loadIG() {
+  const mes=document.getElementById('ig-mes').value;
+  const anio=document.getElementById('ig-anio').value;
+  const tipo=document.getElementById('ig-tipo').value;
+  let qs='';
+  if(mes&&anio) qs+=`fecha=gte.${anio}-${mes}-01&fecha=lte.${anio}-${mes}-31`;
+  else if(anio) qs+=`fecha=gte.${anio}-01-01&fecha=lte.${anio}-12-31`;
+  if(tipo) qs+=(qs?'&':'')+`tipo=eq.${tipo}`;
+  try {
+    const rows=await dbGet('ingresos_gastos',qs);
+    // Rellenar años
+    const ySel=document.getElementById('ig-anio');
+    if(ySel.options.length<=1) {
+      [...new Set(rows.map(r=>r.fecha?.split('-')[0]).filter(Boolean))].sort().reverse()
+        .forEach(y=>{const o=document.createElement('option');o.value=y;o.textContent=y;ySel.appendChild(o);});
+    }
+    const ing=rows.filter(r=>r.tipo==='ingreso').reduce((s,r)=>s+Number(r.importe||0),0);
+    const gas=rows.filter(r=>r.tipo==='gasto').reduce((s,r)=>s+Number(r.importe||0),0);
+    document.getElementById('ig-total-ing').textContent=fmt(ing);
+    document.getElementById('ig-total-gas').textContent=fmt(gas);
+    const bEl=document.getElementById('ig-bal');
+    bEl.textContent=fmt(ing-gas); bEl.className='card-value '+(ing-gas>=0?'green':'red');
+    const tbody=document.getElementById('ig-tbody');
+    tbody.innerHTML=rows.length?rows.map(r=>`
+      <tr>
+        <td>${fmtD(r.fecha)}</td>
+        <td><span class="badge ${r.tipo==='ingreso'?'badge-green':'badge-red'}">${r.tipo}</span></td>
+        <td>${r.categoria||'—'}</td>
+        <td class="td-main">${r.descripcion||'—'}</td>
+        <td class="td-main" style="color:${r.tipo==='ingreso'?'var(--accent)':'var(--accent4)'}">${fmt(r.importe)}</td>
+        <td><div class="row-actions">
+          <button class="btn btn-ghost btn-sm" onclick='editIG(${JSON.stringify(r)})'>✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="del('ingresos_gastos','${r.id}',loadIG)">🗑️</button>
+        </div></td>
+      </tr>`).join('') : `<tr><td colspan="6">${empty('💰','Sin movimientos registrados')}</td></tr>`;
+  } catch(e) { alert2('Error cargando datos','error'); }
+}
+function editIG(r) { document.getElementById('modal-ig-t').textContent='Editar movimiento'; openModal('modal-ig',r); }
+async function saveIG() {
+  await saveItem('ingresos_gastos',{
+    tipo:document.getElementById('f-ig-tipo').value,
+    fecha:document.getElementById('f-ig-fecha').value,
+    categoria:document.getElementById('f-ig-cat').value,
+    importe:parseFloat(document.getElementById('f-ig-imp').value)||0,
+    descripcion:document.getElementById('f-ig-des').value
+  },'modal-ig',loadIG);
+}
+
+// ===== SEGUROS =====
+async function loadSeg() {
+  try {
+    const rows=await dbGet('seguros','');
+    const tbody=document.getElementById('seg-tbody');
+    tbody.innerHTML=rows.length?rows.map(r=>{
+      const d=daysTo(r.fecha_renovacion);
+      return `<tr>
+        <td class="td-main">${r.nombre||'—'}</td>
+        <td>${r.compania||'—'}</td>
+        <td>${r.cobertura||'—'}</td>
+        <td>${fmt(r.prima_anual)}</td>
+        <td>${fmt(r.prima_mensual)}</td>
+        <td><span class="badge ${d!=null&&d<=30?'badge-yellow':'badge-green'}">${fmtD(r.fecha_renovacion)}</span></td>
+        <td><div class="row-actions">
+          <button class="btn btn-ghost btn-sm" onclick='editSeg(${JSON.stringify(r)})'>✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="del('seguros','${r.id}',loadSeg)">🗑️</button>
+        </div></td>
+      </tr>`;
+    }).join('') : `<tr><td colspan="7">${empty('🛡️','Sin seguros registrados')}</td></tr>`;
+  } catch(e) { alert2('Error','error'); }
+}
+function editSeg(r) { document.getElementById('modal-seg-t').textContent='Editar Seguro'; openModal('modal-seguro',r); }
+async function saveSeguro() {
+  await saveItem('seguros',{
+    nombre:document.getElementById('f-seg-nom').value,
+    compania:document.getElementById('f-seg-com').value,
+    prima_anual:parseFloat(document.getElementById('f-seg-pa').value)||0,
+    prima_mensual:parseFloat(document.getElementById('f-seg-pm').value)||0,
+    fecha_renovacion:document.getElementById('f-seg-ren').value||null,
+    cobertura:document.getElementById('f-seg-cob').value,
+    notas:document.getElementById('f-seg-not').value
+  },'modal-seguro',loadSeg);
+}
+
+// ===== SUMINISTROS =====
+function setSumFiltro(f,el) {
+  sumFiltro=f;
+  document.querySelectorAll('#sec-suministros .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  loadSum();
+}
+async function loadSum() {
+  try {
+    const rows=await dbGet('suministros',sumFiltro?`tipo=eq.${sumFiltro}`:'');
+    const icons={luz:'⚡',agua:'💧',gas:'🔥',internet:'🌐',otro:'📦'};
+    const tbody=document.getElementById('sum-tbody');
+    tbody.innerHTML=rows.length?rows.map(r=>`
+      <tr>
+        <td class="td-main">${icons[r.tipo]||'📦'} ${r.tipo||'—'}</td>
+        <td>${r.compania||'—'}</td>
+        <td style="color:var(--accent3)">${fmt(r.importe)}</td>
+        <td>${fmtD(r.fecha_factura)}</td>
+        <td>${fmtD(r.fecha_vencimiento)}</td>
+        <td>${r.notas||'—'}</td>
+        <td><div class="row-actions">
+          <button class="btn btn-ghost btn-sm" onclick='editSum(${JSON.stringify(r)})'>✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="del('suministros','${r.id}',loadSum)">🗑️</button>
+        </div></td>
+      </tr>`).join('') : `<tr><td colspan="7">${empty('⚡','Sin suministros registrados')}</td></tr>`;
+  } catch(e) { alert2('Error','error'); }
+}
+function editSum(r) { document.getElementById('modal-sum-t').textContent='Editar Suministro'; openModal('modal-suministro',r); }
+async function saveSuministro() {
+  await saveItem('suministros',{
+    tipo:document.getElementById('f-sum-tip').value,
+    compania:document.getElementById('f-sum-com').value,
+    importe:parseFloat(document.getElementById('f-sum-imp').value)||0,
+    fecha_factura:document.getElementById('f-sum-fec').value||null,
+    fecha_vencimiento:document.getElementById('f-sum-ven').value||null,
+    notas:document.getElementById('f-sum-not').value
+  },'modal-suministro',loadSum);
+}
+
+// ===== TELECOM =====
+async function loadTel() {
+  try {
+    const rows=await dbGet('telecomunicaciones','');
+    const tbody=document.getElementById('tel-tbody');
+    tbody.innerHTML=rows.length?rows.map(r=>`
+      <tr>
+        <td class="td-main">${r.operador||'—'}</td>
+        <td>${r.tarifa||'—'}</td>
+        <td style="color:var(--accent3)">${fmt(r.coste_mensual)}</td>
+        <td>${fmtD(r.fecha_renovacion)}</td>
+        <td>${r.notas||'—'}</td>
+        <td><div class="row-actions">
+          <button class="btn btn-ghost btn-sm" onclick='editTel(${JSON.stringify(r)})'>✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="del('telecomunicaciones','${r.id}',loadTel)">🗑️</button>
+        </div></td>
+      </tr>`).join('') : `<tr><td colspan="6">${empty('📱','Sin contratos registrados')}</td></tr>`;
+  } catch(e) { alert2('Error','error'); }
+}
+function editTel(r) { document.getElementById('modal-tel-t').textContent='Editar Telecom'; openModal('modal-telecom',r); }
+async function saveTelecom() {
+  await saveItem('telecomunicaciones',{
+    operador:document.getElementById('f-tel-op').value,
+    tarifa:document.getElementById('f-tel-tar').value,
+    coste_mensual:parseFloat(document.getElementById('f-tel-cos').value)||0,
+    fecha_renovacion:document.getElementById('f-tel-ren').value||null,
+    notas:document.getElementById('f-tel-not').value
+  },'modal-telecom',loadTel);
+}
+
+// ===== SUSCRIPCIONES =====
+async function loadSub() {
+  try {
+    const rows=await dbGet('suscripciones','');
+    const total=rows.filter(r=>r.activa).reduce((s,r)=>{let c=Number(r.coste||0);if(r.frecuencia==='anual')c/=12;if(r.frecuencia==='trimestral')c/=3;return s+c;},0);
+    document.getElementById('sub-total').textContent=fmt(total);
+    const tbody=document.getElementById('sub-tbody');
+    tbody.innerHTML=rows.length?rows.map(r=>`
+      <tr>
+        <td class="td-main">${r.nombre||'—'}</td>
+        <td style="color:var(--accent3)">${fmt(r.coste)}</td>
+        <td><span class="badge badge-gray">${r.frecuencia||'—'}</span></td>
+        <td>${fmtD(r.fecha_cobro)}</td>
+        <td><span class="badge ${r.activa?'badge-green':'badge-red'}">${r.activa?'Activa':'Inactiva'}</span></td>
+        <td>${r.notas||'—'}</td>
+        <td><div class="row-actions">
+          <button class="btn btn-ghost btn-sm" onclick='editSub(${JSON.stringify(r)})'>✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="del('suscripciones','${r.id}',loadSub)">🗑️</button>
+        </div></td>
+      </tr>`).join('') : `<tr><td colspan="7">${empty('🔄','Sin suscripciones registradas')}</td></tr>`;
+  } catch(e) { alert2('Error','error'); }
+}
+function editSub(r) { document.getElementById('modal-sub-t').textContent='Editar Suscripción'; openModal('modal-sub',r); }
+async function saveSub() {
+  await saveItem('suscripciones',{
+    nombre:document.getElementById('f-sub-nom').value,
+    coste:parseFloat(document.getElementById('f-sub-cos').value)||0,
+    frecuencia:document.getElementById('f-sub-fre').value,
+    fecha_cobro:document.getElementById('f-sub-fec').value||null,
+    activa:document.getElementById('f-sub-act').value==='true',
+    notas:document.getElementById('f-sub-not').value
+  },'modal-sub',loadSub);
+}
+
+// ===== PRÉSTAMOS =====
+async function loadPre() {
+  try {
+    const rows=await dbGet('prestamos','');
+    const tp=rows.reduce((s,r)=>s+Number(r.capital_pendiente||0),0);
+    const tc=rows.reduce((s,r)=>s+Number(r.cuota_mensual||0),0);
+    document.getElementById('pre-cards').innerHTML=`
+      <div class="card" style="padding:14px 20px"><div class="card-label">Total pendiente</div><div class="card-value red">${fmt(tp)}</div></div>
+      <div class="card" style="padding:14px 20px"><div class="card-label">Cuota total/mes</div><div class="card-value yellow">${fmt(tc)}</div></div>`;
+    const tbody=document.getElementById('pre-tbody');
+    tbody.innerHTML=rows.length?rows.map(r=>{
+      const pct=r.capital_inicial>0?Math.min(100,Math.round((1-r.capital_pendiente/r.capital_inicial)*100)):0;
+      return `<tr>
+        <td class="td-main">${r.nombre||'—'}</td>
+        <td>${fmt(r.capital_inicial)}</td>
+        <td style="color:var(--accent4)">${fmt(r.capital_pendiente)}</td>
+        <td style="color:var(--accent3)">${fmt(r.cuota_mensual)}</td>
+        <td>${fmtN(r.tipo_interes)}%</td>
+        <td>${fmtD(r.fecha_fin)}</td>
+        <td style="min-width:130px">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px">${pct}% pagado</div>
+          <div class="progress-wrap"><div class="progress-bar" style="width:${pct}%"></div></div>
+        </td>
+        <td><div class="row-actions">
+          <button class="btn btn-ghost btn-sm" onclick='editPre(${JSON.stringify(r)})'>✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="del('prestamos','${r.id}',loadPre)">🗑️</button>
+        </div></td>
+      </tr>`;
+    }).join('') : `<tr><td colspan="8">${empty('🏦','Sin préstamos registrados')}</td></tr>`;
+  } catch(e) { alert2('Error','error'); }
+}
+function editPre(r) { document.getElementById('modal-pre-t').textContent='Editar Préstamo'; openModal('modal-pre',r); }
+async function savePre() {
+  await saveItem('prestamos',{
+    nombre:document.getElementById('f-pre-nom').value,
+    capital_inicial:parseFloat(document.getElementById('f-pre-ci').value)||0,
+    capital_pendiente:parseFloat(document.getElementById('f-pre-cp').value)||0,
+    cuota_mensual:parseFloat(document.getElementById('f-pre-cuo').value)||0,
+    tipo_interes:parseFloat(document.getElementById('f-pre-int').value)||0,
+    fecha_inicio:document.getElementById('f-pre-ini').value||null,
+    fecha_fin:document.getElementById('f-pre-fin').value||null,
+    notas:document.getElementById('f-pre-not').value
+  },'modal-pre',loadPre);
+}
+
+// ===== AHORRO =====
+async function loadAho() {
+  try {
+    const rows=await dbGet('objetivos_ahorro','');
+    const grid=document.getElementById('aho-grid');
+    grid.innerHTML=rows.length?rows.map(r=>{
+      const pct=r.importe_meta>0?Math.min(100,Math.round(r.importe_actual/r.importe_meta*100)):0;
+      const d=daysTo(r.fecha_objetivo);
+      return `<div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+          <div style="font-size:15px;font-weight:500;color:var(--text)">${r.nombre}</div>
+          <div class="row-actions">
+            <button class="btn btn-ghost btn-sm" onclick='editAho(${JSON.stringify(r)})'>✏️</button>
+            <button class="btn btn-danger btn-sm" onclick="del('objetivos_ahorro','${r.id}',loadAho)">🗑️</button>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px">
+          <span style="color:var(--accent)">${fmt(r.importe_actual)}</span>
+          <span style="color:var(--text3)">meta: ${fmt(r.importe_meta)}</span>
+        </div>
+        <div class="progress-wrap"><div class="progress-bar" style="width:${pct}%"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--text3)">
+          <span>${pct}% conseguido</span>
+          ${d!=null?`<span>${d>0?d+' días restantes':'¡Meta cumplida! 🎉'}</span>`:''}
+        </div>
+        ${r.notas?`<div style="margin-top:8px;font-size:12px;color:var(--text3)">${r.notas}</div>`:''}
+      </div>`;
+    }).join('') : empty('🎯','Sin objetivos definidos. ¡Crea el primero!');
+  } catch(e) { alert2('Error','error'); }
+}
+function editAho(r) { document.getElementById('modal-aho-t').textContent='Editar Objetivo'; openModal('modal-aho',r); }
+async function saveAho() {
+  await saveItem('objetivos_ahorro',{
+    nombre:document.getElementById('f-aho-nom').value,
+    importe_meta:parseFloat(document.getElementById('f-aho-met').value)||0,
+    importe_actual:parseFloat(document.getElementById('f-aho-act').value)||0,
+    fecha_objetivo:document.getElementById('f-aho-fec').value||null,
+    notas:document.getElementById('f-aho-not').value
+  },'modal-aho',loadAho);
+}
+
+// ===== PORTFOLIO =====
+async function loadPort() {
+  try {
+    const rows=await dbGet('portfolio','');
+    const val=rows.reduce((s,r)=>s+Number(r.participaciones||0)*Number(r.precio_actual||0),0);
+    const cos=rows.reduce((s,r)=>s+Number(r.participaciones||0)*Number(r.precio_medio||0),0);
+    const gan=val-cos;
+    const ren=cos>0?gan/cos*100:0;
+    document.getElementById('port-val').textContent=fmt(val);
+    document.getElementById('port-cos').textContent=fmt(cos);
+    const gEl=document.getElementById('port-gan'); gEl.textContent=fmt(gan); gEl.className='card-value '+(gan>=0?'green':'red');
+    const rEl=document.getElementById('port-ren'); rEl.textContent=fmtN(ren)+'%'; rEl.className='card-value '+(ren>=0?'green':'red');
+    const tbody=document.getElementById('port-tbody');
+    tbody.innerHTML=rows.length?rows.map(r=>{
+      const v=Number(r.participaciones||0)*Number(r.precio_actual||0);
+      const c=Number(r.participaciones||0)*Number(r.precio_medio||0);
+      const g=v-c; const rr=c>0?g/c*100:0;
+      return `<tr>
+        <td class="td-main">${r.ticker||'—'}</td>
+        <td>${r.nombre||'—'}</td>
+        <td><span class="badge badge-blue">${r.tipo||'—'}</span></td>
+        <td>${fmtN(r.participaciones,4)}</td>
+        <td>${fmtN(r.precio_medio,4)} €</td>
+        <td>${fmtN(r.precio_actual,4)} €</td>
+        <td style="color:var(--accent)">${fmt(v)}</td>
+        <td style="color:${g>=0?'var(--accent)':'var(--accent4)'}">${g>=0?'+':''}${fmt(g)}</td>
+        <td style="color:${rr>=0?'var(--accent)':'var(--accent4)'}">${rr>=0?'+':''}${fmtN(rr)}%</td>
+        <td><div class="row-actions">
+          <button class="btn btn-ghost btn-sm" onclick='editPort(${JSON.stringify(r)})'>✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="del('portfolio','${r.id}',loadPort)">🗑️</button>
+        </div></td>
+      </tr>`;
+    }).join('') : `<tr><td colspan="10">${empty('📈','Sin activos en portfolio')}</td></tr>`;
+  } catch(e) { alert2('Error','error'); }
+}
+function editPort(r) { document.getElementById('modal-port-t').textContent='Editar Activo'; openModal('modal-port',r); }
+async function savePort() {
+  await saveItem('portfolio',{
+    ticker:document.getElementById('f-port-tic').value,
+    nombre:document.getElementById('f-port-nom').value,
+    tipo:document.getElementById('f-port-tip').value,
+    participaciones:parseFloat(document.getElementById('f-port-par').value)||0,
+    precio_medio:parseFloat(document.getElementById('f-port-pm').value)||0,
+    precio_actual:parseFloat(document.getElementById('f-port-pa').value)||0,
+    notas:document.getElementById('f-port-not').value
+  },'modal-port',loadPort);
+}
+
+// INIT
+document.querySelectorAll('.modal-overlay').forEach(m=>{
+  m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id);});
+});
+loadDash();
+</script>
+</body>
+</html>
